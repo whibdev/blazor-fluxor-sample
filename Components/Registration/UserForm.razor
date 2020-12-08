@@ -1,0 +1,84 @@
+﻿@using Flux.Wasm.Dto
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using Flux.Wasm.Store.Registration
+@inject IState<RegistrationState> RegistrationState
+@inject IDispatcher Dispatcher
+
+<EditForm EditContext="@_editContext" OnValidSubmit="@HandleValidSubmit">
+    <FluentValidationValidator />
+
+    <div>
+        <label for="namefirst">First Name</label>
+        <InputText id="namefirst" @bind-Value="@_model.NameFirst" @onfocus="(() => _showTipFirstName = true)" @onblur="(() => _showTipFirstName = false)" />
+        <ToolTip Show="@_showTipFirstName" Text="Tool Tip here" />
+        <ValidationMessage For="@(() => _model.NameFirst)" />
+    </div>
+    <div>
+        <label for="namelast">Last Name</label>
+        <InputText id="namelast" @bind-Value="@_model.NameLast" />
+        <ToolTip Show="true" Text="Hello from tool tip" />
+        <ValidationMessage For="@(() => _model.NameLast)" />
+    </div>
+    <div>
+        <label for="phone">Phone</label>
+        <InputText id="phone" @bind-Value="@_model.Phone" />
+        <ValidationMessage For="@(() => _model.Phone)" />
+    </div>
+    <div>
+        <label for="email">Email</label>
+        <InputText id="email" @bind-Value="@_model.Email" />
+        <ValidationMessage For="@(() => _model.Email)" />
+    </div>
+
+    <div>
+        <ValidationSummary />
+        <button type="submit" disabled="@AllFormDataIsValid.Equals(false)">Next</button>
+    </div>
+</EditForm>
+
+
+@code
+{
+    private bool _showTipFirstName = false;
+
+    private EditContext _editContext;
+    private UserDto _model = new UserDto();
+    private bool AllFormDataIsValid { get; set; } = false;
+
+    private void ShowToolTip()
+    {
+        _model.Phone = "Focus pokus";
+    }
+
+    protected override void OnInitialized()
+    {
+        _model = RegistrationState.Value.RegistrationDto.User;
+
+        _editContext = new EditContext(_model);
+        _editContext.OnFieldChanged += HandleFieldChanged;
+
+        AllFormDataIsValid = _model.IsStepComplete;
+
+        base.OnInitialized();
+    }
+
+    private void HandleValidSubmit()
+    {
+        _model.IsStepComplete = true;
+        Dispatcher.Dispatch(new UpdateUserAction { User = _model });
+        Dispatcher.Dispatch(new UpdateCurrentStepAction { Step = RegistrationState.Value.RegistrationDto.NextRegistrationStep });
+    }
+
+    private void ValidateForm()
+    {
+        AllFormDataIsValid = _editContext.Validate();
+    }
+
+    private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        ValidateForm();
+
+        _model.IsStepComplete = AllFormDataIsValid;
+        Dispatcher.Dispatch(new UpdateUserAction { User = _model });
+    }
+}

@@ -1,0 +1,85 @@
+﻿@using Flux.Wasm.Dto
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using Flux.Wasm.Store.Registration
+@inject IState<RegistrationState> RegistrationState
+@inject IDispatcher Dispatcher
+
+<EditForm EditContext="@_editContext" OnValidSubmit="@HandleValidSubmit">
+    <FluentValidationValidator />
+
+    <div>
+        <label for="nameoncard">Name On Card</label>
+        <InputText id="nameoncard" @bind-Value="@_model.NameOnCard" />
+        <ValidationMessage For="@(() => _model.NameOnCard)" />
+    </div>
+    <div>
+        <label for="cardnumber">Card Number</label>
+        <InputText id="cardnumber" @bind-Value="@_model.CardNumber" />
+        <ValidationMessage For="@(() => _model.CardNumber)" />
+    </div>
+    <div>
+        <label for="expmonth">Exp Month</label>
+        <InputText id="expmonth" @bind-Value="@_model.ExpMonth" />
+        <ValidationMessage For="@(() => _model.ExpMonth)" />
+    </div>
+    <div>
+        <label for="expyear">Exp Year</label>
+        <InputText id="expyear" @bind-Value="@_model.ExpYear" />
+        <ValidationMessage For="@(() => _model.ExpYear)" />
+    </div>
+
+    <div>
+        <label for="cvv">Cvv</label>
+        <InputText id="cvv" @bind-Value="@_model.Cvv" Maxlength="2" />
+        <ValidationMessage For="@(() => _model.Cvv)" />
+    </div>
+
+    <div>
+        <ValidationSummary />
+        <button type="submit" disabled="@AllFormDataIsValid.Equals(false)">Next</button>
+    </div>
+</EditForm>
+
+
+@code
+{
+    private EditContext _editContext;
+    private PaymentInfoDto _model = new PaymentInfoDto();
+    private bool AllFormDataIsValid { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        _model = RegistrationState.Value.RegistrationDto.PaymentInfo;
+
+        _editContext = new EditContext(_model);
+        _editContext.OnFieldChanged += HandleFieldChanged;
+
+        AllFormDataIsValid = _model.IsStepComplete;
+
+        base.OnInitialized();
+    }
+
+    private void HandleValidSubmit()
+    {
+        _model.IsStepComplete = true;
+        Dispatcher.Dispatch(new UpdatePaymentInfoAction { PaymentInfo = _model });
+        
+        var regDto = RegistrationState.Value.RegistrationDto;
+        regDto.IsOnConfirmationStep = true;
+        Dispatcher.Dispatch(new UpdateRegistrationDetailAction{RegistrationDto = regDto });
+
+        Dispatcher.Dispatch(new UpdateCurrentStepAction { Step = RegistrationState.Value.RegistrationDto.NextRegistrationStep });
+    }
+
+    private void ValidateForm()
+    {
+        AllFormDataIsValid = _editContext.Validate();
+    }
+
+    private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        ValidateForm();
+        _model.IsStepComplete = AllFormDataIsValid;
+        Dispatcher.Dispatch(new UpdatePaymentInfoAction { PaymentInfo = _model });
+    }
+}

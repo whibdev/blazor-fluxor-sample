@@ -1,0 +1,10 @@
+﻿@if (Show)
+{
+    <small class="form-text text-muted">@Text</small>
+}
+
+@code
+{
+    [Parameter] public bool Show { get; set; } = true;
+    [Parameter] public string Text { get; set; }
+}

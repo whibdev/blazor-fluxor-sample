@@ -1,0 +1,63 @@
+﻿@page "/"
+@using Flux.Wasm.Store.Registration
+@using Flux.Wasm.Components.Registration
+@using Flux.Wasm.Dto
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<RegistrationState> RegState
+@inject IDispatcher Dispatcher
+
+<h1>Reg Wizard</h1>
+
+<div class="btn-group btn-group-toggle" data-toggle="buttons">
+    <label class="btn btn-secondary" @onclick="(() => SetStep(RegistrationStepEnum.UserForm))">
+        <input type="radio" name="options" id="user" checked> User
+    </label>
+    <label class="btn btn-secondary" @onclick="(() => SetStep(RegistrationStepEnum.CompanyDetailForm))">
+        <input type="radio" name="options" id="company" checked> Company
+    </label>
+    <label class="btn btn-secondary" @onclick="(() => SetStep(RegistrationStepEnum.PaymentInfoForm))">
+        <input type="radio" name="options" id="payment" checked> Payment
+    </label>
+    <label class="btn btn-secondary" @onclick="(() => SetStep(RegistrationStepEnum.Confirmation))">
+        <input type="radio" name="options" id="payment" checked> Confirmation
+    </label>
+    <label class="btn btn-secondary" @onclick="(() => SetStep(RegistrationStepEnum.Complete))">
+        <input type="radio" name="options" id="payment" checked> Complete
+    </label>
+</div>
+<div style="padding: 2em 1em;">
+    @switch (RegState.Value.RegistrationDto.CurrentStep)
+    {
+        case RegistrationStepEnum.UserForm:
+            <UserForm />
+            break;
+        case RegistrationStepEnum.CompanyDetailForm:
+            <CompanyDetailForm />
+            break;
+        case RegistrationStepEnum.PaymentInfoForm:
+            <PaymentInfoForm />
+            break;
+        case RegistrationStepEnum.Confirmation:
+            <Confirmation />
+            break;
+        case RegistrationStepEnum.Complete:
+            //  persist state and show complete
+            <Complete />
+            break;
+        default:
+            throw new ArgumentOutOfRangeException();
+    }
+</div>
+
+
+
+@code
+{
+    private void SetStep(RegistrationStepEnum step)
+    {
+        if (RegState.Value.RegistrationDto.IsRequestedNavigationStepOk(step))
+        {
+            Dispatcher.Dispatch(new UpdateCurrentStepAction { Step = step });
+        }
+    }
+}

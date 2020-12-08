@@ -1,0 +1,10 @@
+﻿[
+  {
+    "outputFile": "wwwroot/css/style.css",
+    "inputFile": "wwwroot/css/style.scss"
+  },
+  {
+    "outputFile": "Components/ToolTip.razor.css",
+    "inputFile": "Components/ToolTip.razor.scss"
+  }
+]

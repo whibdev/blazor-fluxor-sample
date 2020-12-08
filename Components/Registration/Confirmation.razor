@@ -1,0 +1,61 @@
+﻿@using Flux.Wasm.Store.Registration
+@inject IState<RegistrationState> RegistrationState
+@inject IDispatcher Dispatcher
+
+<h1>Confirmation</h1>
+
+<h2>User</h2>
+<dl>
+    <dt>First</dt>
+    <dd>@RegistrationState.Value.RegistrationDto.User.NameFirst</dd>
+
+    <dt>Last</dt>
+    <dd>@RegistrationState.Value.RegistrationDto.User.NameLast</dd>
+
+    <dt>Phone</dt>
+    <dd>@RegistrationState.Value.RegistrationDto.User.Phone</dd>
+
+    <dt>Email</dt>
+    <dd>@RegistrationState.Value.RegistrationDto.User.Email</dd>
+</dl>
+
+<h2>Company Info</h2>
+<dl>
+    <dt>Name</dt>
+    <dd>@RegistrationState.Value.RegistrationDto.CompanyDetail.Name</dd>
+
+    <dt>Description</dt>
+    <dd>@RegistrationState.Value.RegistrationDto.CompanyDetail.Description</dd>
+
+    <dt>Incorporation Date</dt>
+    <dd>@RegistrationState.Value.RegistrationDto.CompanyDetail.IncDate.ToString("dd-MMM-yyyy")</dd>
+</dl>
+
+<h2>Payment Info</h2>
+<dl>
+    <dt>Name On Card</dt>
+    <dd>@RegistrationState.Value.RegistrationDto.PaymentInfo.NameOnCard</dd>
+
+    <dt>Card Number</dt>
+    <dd>@RegistrationState.Value.RegistrationDto.PaymentInfo.CardNumber</dd>
+
+    <dt>Exp</dt>
+    <dd>@RegistrationState.Value.RegistrationDto.PaymentInfo.ExpMonth/@RegistrationState.Value.RegistrationDto.PaymentInfo.ExpYear"</dd>
+
+    <dt>Cvv</dt>
+    <dd>@RegistrationState.Value.RegistrationDto.PaymentInfo.Cvv</dd>
+</dl>
+
+<button type="submit" class="btn btn-dark" @onclick="@CompleteRegistration">Complete</button>
+
+@code
+{
+    private void CompleteRegistration()
+    {
+        var regDto = RegistrationState.Value.RegistrationDto;
+        regDto.IsOnConfirmationStep = false;
+        Dispatcher.Dispatch(new UpdateRegistrationDetailAction { RegistrationDto = regDto });
+
+        Dispatcher.Dispatch(new UpdateCurrentStepAction { Step = RegistrationState.Value.RegistrationDto.NextRegistrationStep });
+    }
+}

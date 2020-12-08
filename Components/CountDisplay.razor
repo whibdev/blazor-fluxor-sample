@@ -1,0 +1,11 @@
+﻿@using Fluxor
+@using Flux.Wasm.Store.Counter
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<CounterState> CounterState
+
+@currentCount
+
+@code
+{
+    private int currentCount => CounterState.Value.Count;
+}

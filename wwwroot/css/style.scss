@@ -1,0 +1,12 @@
+﻿@import 'bootstrap/scss/bootstrap';
+
+form {
+    input, select {
+        @extend .form-control;
+    }
+
+    button {
+        @extend .btn;
+        @extend .btn-dark;
+    }
+}

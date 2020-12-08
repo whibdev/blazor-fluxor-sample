@@ -1,0 +1,36 @@
+﻿@page "/counter"
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using Fluxor
+@using Flux.Wasm.Store.Counter
+@inject IState<CounterState> CounterState
+@inject IDispatcher Dispatcher
+<h1>Counter</h1>
+
+<p>Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<button class="btn btn-secondary" @onclick="IncrementCount2">Add 2</button>
+
+<button class="btn btn-secondary" @onclick="SubtractCount">Subtract 3</button>
+
+@code {
+    private int currentCount => CounterState.Value.Count;
+
+    private void IncrementCount()
+    {
+        //  currentCount++;
+        Dispatcher.Dispatch(new AddCounterAction{Count = 5});
+    }
+
+    private void IncrementCount2()
+    {
+    //  currentCount++;
+        Dispatcher.Dispatch(new AddCounter2Action());
+    }
+
+    private void SubtractCount()
+    {
+        Dispatcher.Dispatch(new SubtractCounterAction{Count = 3});
+    }
+}

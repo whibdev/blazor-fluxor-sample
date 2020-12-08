@@ -1,0 +1,68 @@
+﻿@using Flux.Wasm.Dto
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using Flux.Wasm.Store.Registration
+@inject IState<RegistrationState> RegistrationState
+@inject IDispatcher Dispatcher
+
+<EditForm EditContext="@_editContext" OnValidSubmit="@HandleValidSubmit">
+    <FluentValidationValidator />
+
+    <div>
+        <label for="companyname">Company Name</label>
+        <InputText id="companyname" @bind-Value="@_model.Name"></InputText>
+        <ValidationMessage For="@(() => _model.Name)" />
+    </div>
+    <div>
+        <label for="description">Description</label>
+        <InputText id="description" @bind-Value="@_model.Description"></InputText>
+        <ValidationMessage For="@(() => _model.Description)" />
+    </div>
+    <div>
+        <label for="incdate">Incorporation Date</label>
+        <InputDate id="incdate" @bind-Value="@_model.IncDate"></InputDate>
+        <ValidationMessage For="@(() => _model.IncDate)" />
+    </div>
+
+    <div>
+        <ValidationSummary />
+        <button type="submit" disabled="@AllFormDataIsValid.Equals(false)">Next</button>
+    </div>
+</EditForm>
+
+
+@code
+{
+    private EditContext _editContext;
+    private CompanyDetailDto _model = new CompanyDetailDto();
+    private bool AllFormDataIsValid { get; set; } = false;
+
+    protected override void OnInitialized()
+    {
+        _model = RegistrationState.Value.RegistrationDto.CompanyDetail;
+        _editContext = new EditContext(_model);
+        _editContext.OnFieldChanged += HandleFieldChanged;
+
+        AllFormDataIsValid = _model.IsStepComplete;
+
+        base.OnInitialized();
+    }
+
+    private void HandleValidSubmit()
+    {
+        _model.IsStepComplete = true;
+        Dispatcher.Dispatch(new UpdateCompanyDetailAction{CompanyDetail = _model});
+        Dispatcher.Dispatch(new UpdateCurrentStepAction{Step = RegistrationState.Value.RegistrationDto.NextRegistrationStep});
+    }
+
+    private void ValidateForm()
+    {
+        AllFormDataIsValid = _editContext.Validate();
+    }
+
+    private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        ValidateForm();
+        _model.IsStepComplete = AllFormDataIsValid;
+        Dispatcher.Dispatch(new UpdateCompanyDetailAction{CompanyDetail = _model});
+    }
+}
