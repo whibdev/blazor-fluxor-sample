@@ -19,18 +19,18 @@
     </div>
     <div>
         <label for="expmonth">Exp Month</label>
-        <InputText id="expmonth" @bind-Value="@_model.ExpMonth" />
+        <InputText id="expmonth" @bind-Value="@_model.ExpMonth" Maxlength="2" />
         <ValidationMessage For="@(() => _model.ExpMonth)" />
     </div>
     <div>
         <label for="expyear">Exp Year</label>
-        <InputText id="expyear" @bind-Value="@_model.ExpYear" />
+        <InputText id="expyear" @bind-Value="@_model.ExpYear" Maxlength="2" />
         <ValidationMessage For="@(() => _model.ExpYear)" />
     </div>
 
     <div>
         <label for="cvv">Cvv</label>
-        <InputText id="cvv" @bind-Value="@_model.Cvv" Maxlength="2" />
+        <InputText id="cvv" @bind-Value="@_model.Cvv" Maxlength="3" />
         <ValidationMessage For="@(() => _model.Cvv)" />
     </div>
 
